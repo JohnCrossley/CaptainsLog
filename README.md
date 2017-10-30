@@ -1,0 +1,2 @@
+# CaptainsLog
+Git repository stats
