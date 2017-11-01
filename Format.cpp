@@ -5,10 +5,10 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <climits>
 
-#define MAX_STRING  50
-#define MAX_LONG     8
-
+const int MAX_STRING = 100;
+const int MAX_LONG   = std::to_string(ULONG_MAX).length();
 const std::string ELLIPSES = "...";
 
 std::string formatString(const std::string string) {
@@ -22,17 +22,16 @@ std::string formatString(const std::string string) {
 }
 
 
-std::string formatValue(const long value) {
+std::string formatValue(const unsigned long value) {
     std::stringstream ss;
     ss << std::setw(MAX_LONG) << value;
     return ss.str();
 }
 
-std::string formatCommit(const std::string string, const long add, const long remove) {
+std::string formatCommit(const std::string string, const unsigned long add, const unsigned long remove) {
     return string + " " + formatValue(add) + "+  " + formatValue(remove) + "-";
 }
 
-std::string formatDiff(const std::string string, const long add, const long remove) {
+std::string formatDiff(const std::string string, const unsigned long add, const unsigned long remove) {
     return formatString(string) + formatValue(add) + "+  " + formatValue(remove) + "-";
 }
-

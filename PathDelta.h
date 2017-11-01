@@ -9,7 +9,7 @@
 
 class PathDelta {
     public :
-        PathDelta(const long add, const long remove, const std::string path);
+        PathDelta(const unsigned long add, const unsigned long remove, const std::string path);
 
         int getAdd() const;
 
@@ -20,8 +20,8 @@ class PathDelta {
         std::string getExtensionType() const;
 
     private :
-        long add;
-        long remove;
+        unsigned long add;
+        unsigned long remove;
         std::string path;
         std::string extensionType;
 };

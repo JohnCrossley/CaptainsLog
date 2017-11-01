@@ -4,12 +4,12 @@
 
 #include "PathDelta.h"
 
-PathDelta::PathDelta(const long add, const long remove, const std::string path) {
+PathDelta::PathDelta(const unsigned long add, const unsigned long remove, const std::string path) {
     this->add = add;
     this->remove = remove;
     this->path = path;
 
-    if (path.rfind('.') >= 0) {
+    if (path.rfind('.') != std::string::npos) {
         extensionType = path.substr(path.rfind('.'));
     }
 }

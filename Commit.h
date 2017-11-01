@@ -16,8 +16,8 @@ class Commit {
         std::vector<std::string> parents;
         std::vector<PathDelta> pathDeltas;
 
-        long add = 0;
-        long remove = 0;
+        unsigned long add = 0;
+        unsigned long remove = 0;
 
     public :
         Commit(const std::string hash, const long time, const std::vector<std::string> parents, const std::vector<PathDelta> pathDeltas);
@@ -26,9 +26,9 @@ class Commit {
 
         long getTime() const;
 
-        long getTotalAdd() const;
+        unsigned long getTotalAdd() const;
 
-        long getTotalRemove() const;
+        unsigned long getTotalRemove() const;
 
         friend std::ostream& operator<<(std::ostream& ostream, const Commit& commit);
 

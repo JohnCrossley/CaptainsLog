@@ -13,8 +13,8 @@ class Author {
     private :
         std::string author;
         std::vector<Commit> commits;
-        long add = 0;
-        long remove = 0;
+        unsigned long add = 0;
+        unsigned long remove = 0;
 
 public:
     Author(std::string author, std::vector<Commit> commits);

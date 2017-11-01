@@ -26,11 +26,12 @@ std::vector<PathDelta> Commit::getPathDeltas() const {
 long Commit::getTime() const {
     return time;
 }
-long Commit::getTotalAdd() const {
+
+unsigned long Commit::getTotalAdd() const {
     return add;
 }
 
-long Commit::getTotalRemove() const {
+unsigned long Commit::getTotalRemove() const {
     return remove;
 }
 

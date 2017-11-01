@@ -41,7 +41,7 @@ int main(const int argc, const char* argv[]) {
         std::vector<Commit> commits = getCommitMetaData(root, args, authorName);
         authors.insert({authorName, {authorName, commits}});
     }
-    
+
     authorCommitStats(authors);
     fileCommitStats(authors);
 

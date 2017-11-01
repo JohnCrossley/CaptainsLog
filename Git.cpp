@@ -5,15 +5,17 @@
 #include <boost/algorithm/string.hpp>
 #include "Git.h"
 
+#define BUFFER 1024
+
 const std::string exec(const std::string root, const std::string cmd) {
 //    std::cout << "exec: " << cmd << std::endl;
 
-    std::array<char, 128> buffer;
+    std::array<char, BUFFER> buffer;
     std::string result;
     std::shared_ptr<FILE> pipe(popen(("cd " + root + ";" + cmd).c_str(), "r"), pclose);
     if (!pipe) throw std::runtime_error("popen() failed!");
     while (!feof(pipe.get())) {
-        if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
+        if (fgets(buffer.data(), BUFFER, pipe.get()) != nullptr)
             result += buffer.data();
     }
     return result;
@@ -44,8 +46,8 @@ std::vector<PathDelta> getPathDeltas(std::string root, std::string hash) {
         std::vector<std::string> parts = {};
         boost::split(parts, file, boost::is_any_of("\t "), boost::token_compress_on);
 
-        const long add = atol(parts[0].c_str());
-        const long remove = atol(parts[1].c_str());
+        const unsigned long add = std::stoul(parts[0].c_str());
+        const unsigned long remove = std::stoul(parts[1].c_str());
 
         pathDeltas.push_back({add, remove, parts[2]});
     }
