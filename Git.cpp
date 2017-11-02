@@ -6,6 +6,7 @@
 #include "Git.h"
 
 #define BUFFER 1024
+#define BINARY "-"
 
 const std::string exec(const std::string root, const std::string cmd) {
 //    std::cout << "exec: " << cmd << std::endl;
@@ -46,8 +47,8 @@ std::vector<PathDelta> getPathDeltas(std::string root, std::string hash) {
         std::vector<std::string> parts = {};
         boost::split(parts, file, boost::is_any_of("\t "), boost::token_compress_on);
 
-        const unsigned long add = std::stoul(parts[0].c_str());
-        const unsigned long remove = std::stoul(parts[1].c_str());
+        const unsigned long add = parts[0].compare(BINARY) == 0 ? -1 : std::stoul(parts[0]);
+        const unsigned long remove = parts[1].compare(BINARY) == 0 ? -1 : std::stoul(parts[1]);
 
         pathDeltas.push_back({add, remove, parts[2]});
     }
