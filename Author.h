@@ -24,6 +24,12 @@ public:
     std::vector<Commit> getCommits() const;
 
     friend std::ostream& operator<<(std::ostream& ostream, const Author& author);
+
+private:
+    long getTotalAdd() const;
+
+    long getTotalRemove() const;
+
 };
 
 
