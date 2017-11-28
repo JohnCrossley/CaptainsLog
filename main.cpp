@@ -13,12 +13,14 @@ void authorCommitStats(const std::map<std::string, Author> authors);
 
 void fileCommitStats(const std::map<std::string, Author> authors);
 
+std::vector<Author> getVectorOfOrderedAuthors(std::map<std::string, Author> authors);
+
 std::vector<Delta> getVectorOfOrderedExtensionTypes(std::map<std::string, Delta> &extensionTypes);
 
 std::vector<Delta> getVectorOfOrderedFiles(std::map<std::string, Delta> &files);
 
 /**
- * Example: --gitroot=/home/johncrossley/src/UnrealEngine --gitargs="--since=\"2 weeks ago\""
+ * Example: --gitroot=/home/johncrossley/src/UnrealEngine --since=\"2 weeks ago\""
  * @param argc
  * @param argv
  * @return
@@ -43,7 +45,7 @@ int main(const int argc, const char* argv[]) {
     }
 
     authorCommitStats(authors);
-    fileCommitStats(authors);
+//    fileCommitStats(authors);
 
     std::cout << std::endl << "Done" << std::endl;
 
@@ -59,17 +61,18 @@ int main(const int argc, const char* argv[]) {
  */
 void init(std::string &root, std::string &args, const int argc, const char* argv[]) {
     std::vector<std::string> parts;
+    args = {};
 
-    for(int i = 0; i < argc; i++) {
+    for(int i = 1; i < argc; i++) {
         parts = {};
 
         if (boost::starts_with(argv[i], "--gitroot=")) {
             boost::split(parts, argv[i], boost::is_any_of("="));
             root = parts[1];
 
-        } else if (boost::starts_with(argv[i], "--gitargs=")) {
-            args = argv[i];
-            args = args.substr(args.find("=") + 1, args.length());
+        } else {
+            std::string s = argv[i];
+            args += s + " ";
 
         }
     }
@@ -78,16 +81,19 @@ void init(std::string &root, std::string &args, const int argc, const char* argv
 void authorCommitStats(const std::map<std::string, Author> authors) {
     std::cout << std::endl << "Author stats: -------------------------------------------------------------------" << std::endl << std::endl;
 
+    //sort by most active to least
+    const std::vector<Author> orderedAuthors = getVectorOfOrderedAuthors(authors);
+
     //print out results
-    for (auto const& author : authors) {
-        std::cout << "Author: " << author.second << std::endl;
+    for (auto const& author : orderedAuthors) {
+        std::cout << author << std::endl;
 
         //commit stats
         std::map<std::string,Delta> files = {};
         std::map<std::string,Delta> extensionTypes = {};
 
         std::cout << "Commit deltas:" << std::endl;
-        for (auto const &commit : author.second.getCommits()) {
+        for (auto const &commit : author.getCommits()) {
             for (auto const &pathDelta : commit.getPathDeltas()) {
                 //paths
                 if (files.find(pathDelta.getPath()) == files.end()) {
@@ -167,6 +173,15 @@ void fileCommitStats(const std::map<std::string, Author> authors) {
     }
 
     std::cout << std::endl << std::endl;
+}
+
+std::vector<Author> getVectorOfOrderedAuthors(std::map<std::string, Author> authors) {
+    std::vector<Author> orderedAuthors = {};
+    transform(authors.begin(), authors.end(), back_inserter(orderedAuthors), [](const std::map<std::string, Author>::value_type& val){return val.second;} );
+    sort(orderedAuthors.begin(), orderedAuthors.end(), [](Author a, Author b) {
+        return (b.getTotalAdd() + b.getTotalRemove()) < (a.getTotalAdd() + a.getTotalRemove());
+    });
+    return orderedAuthors;
 }
 
 std::vector<Delta> getVectorOfOrderedFiles(std::map<std::string, Delta> &files) {
