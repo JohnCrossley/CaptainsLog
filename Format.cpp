@@ -17,7 +17,7 @@ std::string formatString(const std::string string) {
     }
 
     std::stringstream ss;
-    ss << std::setw(MAX_STRING) << string;
+    ss << std::left << std::setw(MAX_STRING) << string;
     return ss.str();
 }
 

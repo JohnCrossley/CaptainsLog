@@ -6,7 +6,6 @@
 #include "Git.h"
 
 #define BUFFER 1024
-#define BINARY "-"
 
 const std::string exec(const std::string root, const std::string cmd) {
 //    std::cout << "exec: " << cmd << std::endl;
@@ -19,14 +18,18 @@ const std::string exec(const std::string root, const std::string cmd) {
         if (fgets(buffer.data(), BUFFER, pipe.get()) != nullptr)
             result += buffer.data();
     }
+
+    boost::trim(result);
+
     return result;
 }
 
 const std::vector<std::string> getAuthorNames(const std::string root, const std::string args) {
-    const std::string command = "git log --pretty=format:\"%an\" " + args + " | sort -u";
+    const std::string command = "git --no-pager log --pretty=format:\"%an\" " + args + " | sort -u";
     const std::string s = exec(root, command);
     std::vector<std::string> authors = {};
     boost::split(authors, s, boost::is_any_of("\n"));
+
     return authors;
 }
 
@@ -47,17 +50,21 @@ std::vector<PathDelta> getPathDeltas(std::string root, std::string hash) {
         std::vector<std::string> parts = {};
         boost::split(parts, file, boost::is_any_of("\t "), boost::token_compress_on);
 
-        const unsigned long add = parts[0].compare(BINARY) == 0 ? -1 : std::stoul(parts[0]);
-        const unsigned long remove = parts[1].compare(BINARY) == 0 ? -1 : std::stoul(parts[1]);
+        if (parts[0].compare("-") != 0 && parts[1].compare("-") != 0) {
+            const unsigned long add = std::stoul(parts[0]);
+            const unsigned long remove = std::stoul(parts[1]);
+            pathDeltas.push_back({add, remove, parts[2]});
+        } else {
+            pathDeltas.push_back({0, 0, parts[2]});
 
-        pathDeltas.push_back({add, remove, parts[2]});
+        }
     }
 
     return pathDeltas;
 }
 
 const std::vector<Commit> getCommitMetaData(std::string root, std::string args, std::string authorName) {
-    const std::string command = "git log --pretty=format:\"%H|%ct|%P\" --author=\"" + authorName + "\" " + args;
+    const std::string command = "git --no-pager log --no-merges --pretty=format:\"%H|%ct|%P\" --author=\"" + authorName + "\" " + args;
     const std::string result = exec(root, command);
 
     std::vector<Commit> commits = {};
