@@ -4,6 +4,7 @@ Git repository stats
 Run this program over your git repository to pull out author level (commit and summary) and repo level stats.
 All broken down by file and extension.
 
+<pre>
 ./CaptainsLog --help
 Usage: /home/johncrossley/src/CaptainsLog/cmake-build-debug/CaptainsLog \
 	--git-root=path \
@@ -13,7 +14,9 @@ Usage: /home/johncrossley/src/CaptainsLog/cmake-build-debug/CaptainsLog \
 	--git-rank=[ delta | change ] \
 	--git-rank-extension='.ext' \
 	--help
+</pre>
 
+<pre>
 More detail:
 --git-root=              path_to_git_repo
 --git-author-commits=    show authors stats broken down per commit
@@ -22,17 +25,19 @@ More detail:
 --git-rank=              sort authors by delta (add - remove) or change (add + remove) with optional extension
 --git-rank-extension=    extension to sort authors by.  I.e. '.java' or '.cpp'
 --help                   this help message
-
+</pre>
 
 Example output for this repository:
 
+<pre>
 Command run: ./CaptainsLog/cmake-build-debug/CaptainsLog --git-root=/home/johncrossley/src/CaptainsLog \
     --git-author-commits=all \
     --git-author-summary=all \
     --git-repo-summary=all \
     --since=\"5 weeks ago\"
+</pre>
 
-
+<pre>
 root: /home/johncrossley/src/CaptainsLog
 args: --since="5 weeks ago"
 author commit mode:  all
@@ -110,3 +115,4 @@ Extension deltas:
 Done
 
 Process finished with exit code 0
+</pre>
