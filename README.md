@@ -1,7 +1,7 @@
 # CaptainsLog
 Git repository stats
 
-Run this program over your git repository to pull out author level stats (to commit and summary) and file level.
+Run this program over your git repository to pull out author level (commit and summary) and repo level stats.
 All broken down by file and extension.
 
 ./CaptainsLog --help
