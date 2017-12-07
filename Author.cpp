@@ -6,7 +6,7 @@
 #include "Date.h"
 #include "Format.h"
 
-Author::Author(std::string author, std::vector<Commit> commits) {
+Author::Author(std::string author, std::vector<Commit> commits, ChangeCalculator *changeCalculator) {
     this->author = author;
     this->commits = commits;
 
@@ -14,6 +14,9 @@ Author::Author(std::string author, std::vector<Commit> commits) {
         add += commit.getTotalAdd();
         remove += commit.getTotalRemove();
     }
+
+    this->changeCalculator = changeCalculator;
+    this->change = changeCalculator->calculateChange(*this);
 }
 
 std::string Author::getAuthor() const {
@@ -29,8 +32,10 @@ std::ostream& operator<<(std::ostream& ostream, const Author& author) {
     std::string lastCommit = (author.getCommits().size() == 0) ? "n/a" : formatDate(author.getCommits()[0]);
 
     std::cout << formatString(author.getAuthor() + " -> " + std::to_string(author.getCommits().size()) + " commits [" + firstCommit + " - " + lastCommit + "]")
-              << formatValue(author.getTotalAdd()) << "+ " << formatValue(author.getTotalRemove()) << "-"
+              << formatValue(author.getTotalAdd()) << "+ " << formatValue(author.getTotalRemove()) << "- "
+              << formatValueSigned(author.getTotal()) << " " << author.changeCalculator->describe()
               << std::endl;
+
     return ostream;
 }
 
@@ -50,6 +55,10 @@ long Author::getTotalRemove() const {
     }
 
     return count;
+}
+
+int Author::getTotal() const {
+    return change;
 }
 
 

@@ -8,11 +8,12 @@
 #include <string>
 #include <vector>
 #include "Commit.h"
+#include "Settings.h"
 
-const std::string exec(const std::string root, const std::string cmd);
+const std::string exec(const Settings, const std::string cmd);
 
-const std::vector<std::string> getAuthorNames(const std::string root, std::string args);
+const std::vector<std::string> getAuthorNames(const Settings settings);
 
-const std::vector<Commit> getCommitMetaData(std::string root, std::string args, std::string authorName);
+const std::vector<Commit> getCommitMetaData(const Settings settings, std::string authorName);
 
 #endif //CAPTAINSLOG_GIT_H

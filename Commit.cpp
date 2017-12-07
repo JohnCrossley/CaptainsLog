@@ -27,15 +27,15 @@ long Commit::getTime() const {
     return time;
 }
 
-unsigned long Commit::getTotalAdd() const {
+long Commit::getTotalAdd() const {
     return add;
 }
 
-unsigned long Commit::getTotalRemove() const {
+long Commit::getTotalRemove() const {
     return remove;
 }
 
 std::ostream& operator<<(std::ostream& ostream, const Commit& commit) {
-    ostream << formatDiff(formatDate(commit), commit.add, commit.remove);
+    ostream << formatDiff(formatDate(commit) + " " + commit.hash, commit.add, commit.remove);
     return ostream;
 }

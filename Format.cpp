@@ -8,7 +8,7 @@
 #include <climits>
 
 const int MAX_STRING = 100;
-const int MAX_LONG   = std::to_string(ULONG_MAX).length();
+const int MAX_LONG   = std::to_string(LONG_MAX).length();
 const std::string ELLIPSES = "...";
 
 std::string formatString(const std::string string) {
@@ -22,16 +22,30 @@ std::string formatString(const std::string string) {
 }
 
 
-std::string formatValue(const unsigned long value) {
+std::string formatValue(const long value) {
     std::stringstream ss;
     ss << std::setw(MAX_LONG) << value;
     return ss.str();
 }
 
-std::string formatCommit(const std::string string, const unsigned long add, const unsigned long remove) {
+std::string formatValueSigned(const long value) {
+    bool positive = value >= 0;
+
+    std::stringstream ss;
+    ss << std::setw(MAX_LONG + 1) << std::abs(value) << (positive ? "+" : "-");
+    return ss.str();
+}
+
+std::string formatCommit(const std::string string, const long add, const long remove) {
     return string + " " + formatValue(add) + "+  " + formatValue(remove) + "-";
 }
 
-std::string formatDiff(const std::string string, const unsigned long add, const unsigned long remove) {
+std::string formatDiff(const std::string string, const long add, const long remove) {
     return formatString(string) + formatValue(add) + "+  " + formatValue(remove) + "-";
+}
+
+std::string padCommand(const std::string command) {
+    std::stringstream ss;
+    ss << std::left << std::setw(25) << command;
+    return ss.str();
 }

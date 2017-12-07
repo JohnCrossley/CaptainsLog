@@ -15,20 +15,20 @@ public :
 
     std::string getName() const;
 
-    void addAmount(unsigned long value);
+    void addAmount(long value);
 
-    void removeAmount(unsigned long value);
+    void removeAmount(long value);
 
-    unsigned long getAdd() const;
+    long getAdd() const;
 
-    unsigned long getRemove() const;
+    long getRemove() const;
 
     friend std::ostream& operator<<(std::ostream& ostream, const Delta& delta);
 
 private :
     std::string name;
-    unsigned long add;
-    unsigned long remove;
+    long add;
+    long remove;
 };
 
 #endif //CAPTAINSLOG_DELTA_H

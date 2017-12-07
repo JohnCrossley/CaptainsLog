@@ -12,11 +12,11 @@ Delta::Delta(std::string name) {
     this->remove = 0L;
 }
 
-void Delta::addAmount(unsigned long value) {
+void Delta::addAmount(long value) {
     add += value;
 }
 
-void Delta::removeAmount(unsigned long value) {
+void Delta::removeAmount(long value) {
     remove += value;
 }
 
@@ -24,11 +24,11 @@ std::string Delta::getName() const {
     return name;
 }
 
-unsigned long Delta::getAdd() const {
+long Delta::getAdd() const {
     return add;
 }
 
-unsigned long Delta::getRemove() const {
+long Delta::getRemove() const {
     return remove;
 }
 

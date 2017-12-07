@@ -7,12 +7,14 @@
 
 #define BUFFER 1024
 
-const std::string exec(const std::string root, const std::string cmd) {
+std::string parsePath(std::string &pathTemplate);
+
+const std::string exec(const Settings settings, const std::string cmd) {
 //    std::cout << "exec: " << cmd << std::endl;
 
     std::array<char, BUFFER> buffer;
     std::string result;
-    std::shared_ptr<FILE> pipe(popen(("cd " + root + ";" + cmd).c_str(), "r"), pclose);
+    std::shared_ptr<FILE> pipe(popen(("cd " + settings.root + ";" + cmd).c_str(), "r"), pclose);
     if (!pipe) throw std::runtime_error("popen() failed!");
     while (!feof(pipe.get())) {
         if (fgets(buffer.data(), BUFFER, pipe.get()) != nullptr)
@@ -24,20 +26,20 @@ const std::string exec(const std::string root, const std::string cmd) {
     return result;
 }
 
-const std::vector<std::string> getAuthorNames(const std::string root, const std::string args) {
-    const std::string command = "git --no-pager log --pretty=format:\"%an\" " + args + " | sort -u";
-    const std::string s = exec(root, command);
+const std::vector<std::string> getAuthorNames(const Settings settings) {
+    const std::string command = "git --no-pager log --pretty=format:\"%an\" " + settings.args + " | sort -u";
+    const std::string s = exec(settings, command);
     std::vector<std::string> authors = {};
     boost::split(authors, s, boost::is_any_of("\n"));
 
     return authors;
 }
 
-std::vector<PathDelta> getPathDeltas(std::string root, std::string hash) {
+std::vector<PathDelta> getPathDeltas(const Settings settings, std::string hash) {
     std::vector<PathDelta> pathDeltas = {};
 
-    const std::string command = "git diff --numstat " + hash;
-    const std::string result = exec(root, command);
+    const std::string command = "git --no-pager diff -M -C --numstat " + hash + "^..." + hash;
+    const std::string result = exec(settings, command);
 
     std::vector<std::string> files = {};
     boost::split(files, result, boost::is_any_of("\n"));
@@ -47,15 +49,21 @@ std::vector<PathDelta> getPathDeltas(std::string root, std::string hash) {
             continue;
         }
 
+        boost::replace_all(file, " => ", "=>");//spaces will mess up the split later on (cannot seem to change this format from git-log
+
         std::vector<std::string> parts = {};
         boost::split(parts, file, boost::is_any_of("\t "), boost::token_compress_on);
 
+        const std::string path = parsePath(parts[2]);
+
         if (parts[0].compare("-") != 0 && parts[1].compare("-") != 0) {
-            const unsigned long add = std::stoul(parts[0]);
-            const unsigned long remove = std::stoul(parts[1]);
-            pathDeltas.push_back({add, remove, parts[2]});
+            const long add = std::stol(parts[0]);
+            const long remove = std::stol(parts[1]);
+            pathDeltas.push_back({add, remove, path});
+
         } else {
-            pathDeltas.push_back({0, 0, parts[2]});
+            //need to determine add / modify / remove from - (and other symbols git will use)
+            pathDeltas.push_back({1, 0, path});
 
         }
     }
@@ -63,9 +71,25 @@ std::vector<PathDelta> getPathDeltas(std::string root, std::string hash) {
     return pathDeltas;
 }
 
-const std::vector<Commit> getCommitMetaData(std::string root, std::string args, std::string authorName) {
-    const std::string command = "git --no-pager log --no-merges --pretty=format:\"%H|%ct|%P\" --author=\"" + authorName + "\" " + args;
-    const std::string result = exec(root, command);
+/**
+ * The path could be of form: /x/y/{a=>b} to signify a rename/move in git
+ * @param pathTemplate
+ */
+std::string parsePath(std::string &pathTemplate) {
+    if (pathTemplate.find("=>") == -1) {
+        return pathTemplate;
+    }
+
+    std::string::size_type s = pathTemplate.find("{");
+    std::string::size_type e = pathTemplate.find("}");
+    std::string::size_type change = pathTemplate.find("=>");
+
+    return pathTemplate.substr(0, s) + pathTemplate.substr(change + 2, e - change - 2) + pathTemplate.substr(e + 1, pathTemplate.length());
+}
+
+const std::vector<Commit> getCommitMetaData(const Settings settings, std::string authorName) {
+    const std::string command = "git --no-pager log --no-merges --pretty=format:\"%H|%ct|%P\" --author=\"" + authorName + "\" " + settings.args;
+    const std::string result = exec(settings, command);
 
     std::vector<Commit> commits = {};
     if (result.length() == 0) {
@@ -89,7 +113,7 @@ const std::vector<Commit> getCommitMetaData(std::string root, std::string args, 
         }
 
         //get file details for commit
-        std::vector<PathDelta> pathDeltas = getPathDeltas(root, hash);
+        std::vector<PathDelta> pathDeltas = getPathDeltas(settings, hash);
         commits.push_back({ hash, time, parents, pathDeltas });
     }
 

@@ -4,7 +4,7 @@
 
 #include "PathDelta.h"
 
-PathDelta::PathDelta(const unsigned long add, const unsigned long remove, const std::string path) {
+PathDelta::PathDelta(const long add, const long remove, const std::string path) {
     this->add = add;
     this->remove = remove;
     this->path = path;
