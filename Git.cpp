@@ -38,8 +38,15 @@ const std::vector<std::string> getAuthorNames(const Settings settings) {
 std::vector<PathDelta> getPathDeltas(const Settings settings, std::string hash) {
     std::vector<PathDelta> pathDeltas = {};
 
-    const std::string command = "git --no-pager diff -M -C --numstat " + hash + "^..." + hash;
-    const std::string result = exec(settings, command);
+    std::string command = "git --no-pager diff -M -C --numstat " + hash + "^..." + hash;
+    std::string result = exec(settings, command);
+
+    //first commit so everything is an add and there is no parent
+    if (result.empty()) {
+        command = "git --no-pager log --oneline --numstat " + hash;
+        result = exec(settings, command);
+        result = result.substr(result.find('\n'));//remove header line
+    }
 
     std::vector<std::string> files = {};
     boost::split(files, result, boost::is_any_of("\n"));
